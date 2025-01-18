@@ -1,6 +1,5 @@
 import { useNavigate,useLocation } from "react-router-dom";
 
-
 interface NavbarProps {
   className: string;
 }
@@ -10,7 +9,7 @@ const Navbar = ({ className }: NavbarProps) => {
   const logoutHandler = async () => {
     navigate("/signout");
   };
-  const navigateSignin = async () => {
+  const handleSignin = async () => {
     navigate("/user");
   };
   return (
@@ -22,7 +21,7 @@ const Navbar = ({ className }: NavbarProps) => {
           </div>
         ) : (
           <div>
-            <button onClick={navigateSignin}>signin as User </button>
+            <button onClick={handleSignin}>signin as User </button>
           </div>
         )}
       </div>

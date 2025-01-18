@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BACKEND_URL } from "../config";
 
 const User = () => {
     const navigate = useNavigate();
@@ -24,11 +25,18 @@ const User = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form Data:', formData);
     // Here, you'd send `formData` to your backend.
-    navigate("/signout");
+    const response = await axios.post(`${BACKEND_URL}api/v1/user/submit`, formData);
+    if (response.status === 200) {
+      alert('Submission successful!');
+      navigate("/signout");
+    }else{
+      alert('Submission failed!');
+    }
+    
   };
 
   return (

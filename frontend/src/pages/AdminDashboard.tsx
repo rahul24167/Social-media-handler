@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useDebounce } from "../hooks/useDebounce";
+import { BACKEND_URL } from "../config";
 type User = {
   name: string;
   socialHandle: string;
@@ -17,7 +18,7 @@ const AdminDashboard = () => {
   };
   const fetchUsers = async () => {
     const response = await axios.post<{ data: Object[] }>(
-      `api/v1/admin/dashboard/users?name=${name}&page=${page}`
+      `${BACKEND_URL}api/v1/admin/users?name=${name}&page=${page}`
     );
     setUsers(response.data.data as User[]);
   };
@@ -44,6 +45,23 @@ const AdminDashboard = () => {
         <button onClick={() => changePage(2)}>{page + 2}</button>
         <button onClick={() => changePage(3)}>{page + 3}</button>
         <button onClick={() => changePage(1)}>Next Page</button>
+      </div>
+      <div>
+        {users.map((user) => (
+          <div key={user.socialHandle}>
+            <div>{user.name}</div>
+            <div>{user.socialHandle}</div>
+            <div>
+              {user.images.map((image) => (
+                <img
+                  key={image.name}
+                  src={URL.createObjectURL(image)}
+                  alt={image.name}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
 
