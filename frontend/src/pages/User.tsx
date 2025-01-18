@@ -28,15 +28,24 @@ const User = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form Data:', formData);
-    // Here, you'd send `formData` to your backend.
-    const response = await axios.post(`${BACKEND_URL}api/v1/user/submit`, formData);
-    if (response.status === 200) {
-      alert('Submission successful!');
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('socialHandle', formData.socialHandle);
+    formData.images.forEach((file) => {
+      data.append('images', file);
+    });
+
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/v1/user/submit`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      console.log('Success:', response.data);
+      alert('Data submitted successfully!');
       navigate("/signout");
-    }else{
-      alert('Submission failed!');
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      alert('Failed to submit data.');
     }
-    
   };
 
   return (
