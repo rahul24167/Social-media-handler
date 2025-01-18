@@ -49,8 +49,7 @@ const signinBody = zod.object({
   email: zod.string().email(),
   password: zod.string().min(6).max(100),
 });
-router.post(
-  "/admin/auth",
+router.post("/admin/auth",
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     const ParsedBody = signinBody.safeParse(req.body);
     if (!ParsedBody.success) {
@@ -71,7 +70,28 @@ router.post(
   }
 );
 
-router.get("/admin/users", authMiddleware, (req, res) => {});
+router.get("/admin/users", authMiddleware, async (req, res) => {
+  try{
+  const { name, page=1 } = req.query;
+  const pageNumber = parseInt(page as string) || 1;
+  const filter: any = {};
+    if (name) {
+      filter.name = { $regex: new RegExp(name as string, "i") }; // Case-insensitive search
+    }
+    const users = await User.find(filter)
+      .skip((pageNumber - 1))
+      .select("name socialHandle images") // Fetch only the required fields
+      .exec();
+      res.status(200).json({
+        users,
+        currentPage: pageNumber,
+      });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+
+});
 router.get("/logout", (req: Request, res: Response) => {
   res.clearCookie("token");
   res.clearCookie("login");

@@ -13,19 +13,30 @@ const Navbar = ({ className }: NavbarProps) => {
     navigate("/user");
   };
   return (
-    <div className={className}>  
+    <div className={`${className} p-4 bg-gray-100 rounded-lg max-w-sm mx-auto`}>
+  <div className="text-center">
+    {(location.pathname == '/user' || location.pathname == '/admin') ? (
       <div>
-        {(location.pathname=='/user' || location.pathname=='/admin') ? (
-          <div>
-            <button onClick={logoutHandler}>signout</button>
-          </div>
-        ) : (
-          <div>
-            <button onClick={handleSignin}>signin as User </button>
-          </div>
-        )}
+        <button 
+          onClick={logoutHandler} 
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+        >
+          Sign Out
+        </button>
       </div>
-    </div>
+    ) : (
+      <div>
+        <button 
+          onClick={handleSignin} 
+          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+        >
+          Sign in as User
+        </button>
+      </div>
+    )}
+  </div>
+</div>
+
   );
 };
 
