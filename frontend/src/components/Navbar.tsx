@@ -1,4 +1,4 @@
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate,useLocation,matchPath } from "react-router-dom";
 
 interface NavbarProps {
   className: string;
@@ -15,7 +15,7 @@ const Navbar = ({ className }: NavbarProps) => {
   return (
     <div className={`${className} p-4 bg-gray-100 rounded-lg max-w-sm mx-auto`}>
   <div className="text-center">
-    {(location.pathname == '/user' || location.pathname == '/admin') ? (
+    {(location.pathname == '/user' || matchPath('/admin/*', location.pathname)) ? (
       <div>
         <button 
           onClick={logoutHandler} 

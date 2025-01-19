@@ -1,41 +1,37 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   console.error("JWT_SECRET is not defined");
   process.exit(1);
 }
-interface JwtPayloadWithUserId {
-  userId?: string;
-  adminId?: string;
-}
+
 export const authMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
-  if (!req.cookies.token) {
-    res.status(401).json({ error: "Unauthorized" });
+): void => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    res.status(401).json({ error: "Unauthorized: No token provided" });
     return;
   }
-  const token = req.cookies.token;
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-    const { userId, adminId } = decoded as JwtPayloadWithUserId;
-    if (userId) {
-      req.body.userId = userId;
-      next();
-      return;
-    } else if (adminId) {
-      req.body.adminId = adminId;
-      next();
-      return;
+
+    if (decoded.adminEmail) {
+      req.body.adminEmail = decoded.adminEmail; // Add adminEmail to the request body
+      next(); // Continue to the next middleware or route handler
     } else {
-      res.status(403).json({"error":"Unauthorized"});
+      res.status(403).json({ error: "Forbidden: Invalid token" });
       return;
     }
   } catch (error) {
-    res.status(403).json({"error":"something went wrong"});
+    console.error("Token verification error:", error);
+    res.status(403).json({ error: "Forbidden: Invalid token" });
     return;
   }
 };

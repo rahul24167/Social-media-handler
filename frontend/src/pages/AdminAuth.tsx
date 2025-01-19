@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { BACKEND_URL } from "../config";
 
 const AdminAuth = () => {
@@ -22,13 +23,12 @@ const AdminAuth = () => {
   const signinHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     const response = await axios.post(
-      `${BACKEND_URL}/api/v1/admin/auth/signin`,
-      { email, password },
-      { withCredentials: true }
+      `${BACKEND_URL}api/v1/admin/auth`,
+      { email, password }
     );
     if (response.status === 200) {
       console.log(response.data);
-      navigate("/dashboard");
+      navigate("/admin/dashboard");
     }
   };
   return (

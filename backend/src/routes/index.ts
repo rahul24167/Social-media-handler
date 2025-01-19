@@ -2,8 +2,6 @@ import express, { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import zod from "zod";
 
-import multer from "multer";
-import mongoose from "mongoose";
 import { User } from "../db";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { upload } from "../middleware/multer.middleware";
@@ -19,29 +17,31 @@ const router = express.Router();
 router.post("/user/submit", upload.array("images", 5), async (req, res) => {
   try {
     const { name, socialHandle } = req.body;
-    if (req.files === undefined) {
-      res.status(400).json({ message: "Please upload at least one image" });
-      return;
-    }
+    const files = req.files as Express.Multer.File[];
 
-    // Get the Cloudinary URLs for uploaded images
-    const imageUrls = (req.files as Express.Multer.File[]).map((file) =>
+    // Upload images to Cloudinary
+    const imageUploadPromises = files.map((file) =>
       uploadOnCloudinary(file.path)
     );
 
+    // Wait for all uploads to finish
+    const uploadedImages = await Promise.all(imageUploadPromises);
+
+    // Extract URLs
+    const imageUrls = uploadedImages.map((upload) => upload ? upload.secure_url : null).filter(url => url !== null);
+
+    // Create the user
     const newUser = new User({
       name,
       socialHandle,
-      images: imageUrls, // Save Cloudinary URLs
+      images: imageUrls,
     });
 
     const savedUser = await newUser.save();
-    res
-      .status(201)
-      .json({ message: "User created successfully", user: savedUser });
+    res.status(201).json({ success: true, user: savedUser });
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error('Error creating user:', error);
+    res.status(500).json({ success: false, message: 'Server error', error });
   }
 });
 

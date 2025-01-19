@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { BACKEND_URL } from "../config";
 
 const User = () => {
@@ -36,7 +37,7 @@ const User = () => {
     });
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/v1/user/submit`, data, {
+      const response = await axios.post(`${BACKEND_URL}api/v1/user/submit`, data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       console.log('Success:', response.data);
